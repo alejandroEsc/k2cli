@@ -283,6 +283,26 @@ func pullImage(ctx context.Context, cli *client.Client, base64Auth string) error
 	return nil
 }
 
+func removeImage(ctx context.Context, cli *client.Client, base64Auth string) error {
+
+	removeOpts := types.ImageRemoveOptions{
+		Force: true,
+		PruneChildren: true,
+	}
+
+	removeResponseBody, err := cli.ImageRemove(ctx, containerImage, removeOpts)
+	if err != nil {
+		return err
+	}
+
+	for _, resp := range removeResponseBody {
+		if strings.HasPrefix(resp.Deleted, "error") {
+			return fmt.Errorf("%v", resp.Deleted)
+		}
+	}
+	return nil
+}
+
 func containerAction(ctx context.Context, cli *client.Client, command []string, krakenlibconfig string) (types.ContainerCreateResponse, int, func(), error) {
 	var containerResponse types.ContainerCreateResponse
 

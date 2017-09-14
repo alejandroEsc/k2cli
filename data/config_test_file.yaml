@@ -1,0 +1,66 @@
+# this config file is not meant to be the full config yaml file.
+# Primarily used to internal unit tests, this should maintained if tests are changed
+# due to schema changes, etc..
+
+
+deployment:
+  clusters:
+    - name: test-cluster-name
+      network: 10.32.0.0/12
+      dns: 10.32.0.2
+      domain: cluster.local
+      providerConfig: *defaultAws
+      nodePools:
+        - name: etcd
+          # 5 nodes recommended for production/high availability clusters. This
+          # configuration is required to tolerate a single node failure during
+          # node upgrades.
+          count: 5
+          etcdConfig: *defaultEtcd
+          containerConfig: *defaultDocker
+          osConfig: *defaultCoreOs
+          nodeConfig: *defaultAwsEtcdNode
+          keyPair: *defaultKeyPair
+        - name: etcdEvents
+          # 5 nodes recommended for production/high availability clusters. This
+          # configuration is required to tolerate a single node failure during
+          # node upgrades.
+          count: 5
+          etcdConfig: *defaultEtcdEvents
+          containerConfig: *defaultDocker
+          osConfig: *defaultCoreOs
+          nodeConfig: *defaultAwsEtcdEventsNode
+          keyPair: *defaultKeyPair
+        - name: master
+          count: 3
+          apiServerConfig: *defaultApiServer
+          kubeConfig: *defaultKube
+          containerConfig: *defaultDocker
+          osConfig: *defaultCoreOs
+          nodeConfig: *defaultAwsMasterNode
+          keyPair: *defaultKeyPair
+        - name: clusterNodes
+          count: 10
+          kubeConfig: *defaultKube
+          containerConfig: *defaultDocker
+          osConfig: *defaultCoreOs
+          nodeConfig: *defaultAwsClusterNode
+          keyPair: *defaultKeyPair
+        - name: specialNodes
+          count: 2
+          # m4.large
+          kubeConfig: *defaultKube
+          containerConfig: *defaultDocker
+          osConfig: *defaultCoreOs
+          nodeConfig: *defaultAwsSpecialNode
+          keyPair: *defaultKeyPair
+      fabricConfig: *kubeVersionedFabric
+      kubeAuth: *rbacKubeAuth
+      helmConfig: *defaultHelm
+      dnsConfig: *defaultDns
+      # customApiDns:
+      helmOverride:
+  readiness:
+    type: exact
+    value: 0
+    wait: 600
