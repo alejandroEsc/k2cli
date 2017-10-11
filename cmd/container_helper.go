@@ -293,6 +293,7 @@ func containerAction(ctx context.Context, cli *client.Client, command []string, 
 		Cmd:          command,
 		AttachStdout: true,
 		Tty:          true,
+		User:         getUserAndGroupIDs(),
 	}
 
 	// ^[\\w]+[\\w-. ]*[\\w]+$ is the name requirement for docker containers as of 1.13.0
@@ -401,4 +402,8 @@ func writeLog(logFilePath string, out []byte) error {
 
 	_, err = fileHandle.Write(out)
 	return err
+}
+
+func getUserAndGroupIDs() string {
+ 	return fmt.Sprintf("%d:%d",os.Getuid(),os.Getgid())
 }
